@@ -1,18 +1,16 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import "@fontsource/barlow/400.css";
+import "@fontsource/barlow/500.css";
+import "@fontsource/barlow/600.css";
+import "@fontsource/barlow-condensed/500.css";
+import "@fontsource/barlow-condensed/600.css";
+import "leaflet/dist/leaflet.css";
+import "./styles.css";
 import App from "./App.tsx";
-import { SettingsProvider } from "./context/SettingsContext.tsx";
-import { ProducersListProvider } from "./context/ProducersListContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <SettingsProvider>
-        <ProducersListProvider>
-          <App />
-        </ProducersListProvider>
-      </SettingsProvider>
-    </BrowserRouter>
-  </StrictMode>
+    <App />
+  </StrictMode>,
 );
