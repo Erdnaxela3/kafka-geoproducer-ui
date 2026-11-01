@@ -1,48 +1,38 @@
 # kafka-geoproducer-ui
 
-This project is a simple UI to simulate devices sending geolocation data to a Kafka topic in JSON format.
+Simulate a fleet of GPS devices and stream their positions to a Kafka topic as JSON.
 
-![map](docs/map.png)
-![settings](docs/setting.png)
+![Geoproducer](docs/screenshot.png)
 
-## Features
-- Default message: deviceId, latitude, longitude, timestamp
-- Multiple simulated devices
-- Interactive map to select the location for each device
-- Kafka server configuration (host, port, topic)
-- Start/Stop sending messages to Kafka
-- Adding/Removing message fields
-- Supported field types: string, number
+- Place devices on a map and draw routes. Each device loops around its stops at its own speed.
+- Shape the message: rename or drop the built-in fields (device name, timestamp, latitude, longitude, speed, heading) and add fixed values, random numbers or random choices.
+- Every tick, each placed device sends one message, keyed by its name, so a device's messages stay in one partition.
+- Watch messages go out in the live log. The brokers, topic, fields and devices are saved in the browser.
 
-## How to run
+## Run it with Docker
 
-0. Prerequisites
-- Node.js
-- pnpm
-
-1. Clone the repository
 ```bash
-git clone https://github.com/Erdnaxela3/kafka-geoproducer-ui.git
-cd kafka-geoproducer-ui
+docker compose up --build
 ```
 
-2.1 Run the backend
+This starts a single-node Kafka and the app on <http://localhost:4000>, already pointed at that Kafka. To watch the messages arrive:
+
 ```bash
-cd backend
-npm install
-node kafkaServer.js
+docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 --topic device-locations --property print.key=true
 ```
 
-2.2 Run the frontend
+## Develop
+
+Requires Node 22.18+ and pnpm.
+
 ```bash
-cd frontend
 pnpm install
-pnpm run dev
+docker compose up -d kafka   # or bring your own broker on localhost:9092
+pnpm dev                     # UI on http://localhost:5173, API on :4000
+pnpm test
 ```
 
-3. Open your browser and go to `http://localhost:5173`
+The server reads `KAFKA_BROKERS` (default `localhost:9092`) and `PORT` (default `4000`). Brokers typed into the UI take precedence.
 
-## Features to be added
-- [ ] Support for more field types
-- [ ] Support for more message formats (e.g. Avro, Protobuf)
-- [ ] Randomizing message fields for each device (number: range, set, etc.)
+Only plaintext brokers are supported for now. SASL and TLS aren't wired up. The server connects to whatever brokers the UI asks for, so don't expose it publicly.
